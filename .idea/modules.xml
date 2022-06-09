@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../FLOATER/.idea/FLOATER.iml" filepath="$PROJECT_DIR$/../FLOATER/.idea/FLOATER.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../flax/examples/.idea/examples.iml" filepath="$PROJECT_DIR$/../flax/examples/.idea/examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../fairseq/.idea/fairseq.iml" filepath="$PROJECT_DIR$/../fairseq/.idea/fairseq.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/transformer_lib.iml" filepath="$PROJECT_DIR$/.idea/transformer_lib.iml" />
+    </modules>
+  </component>
+</project>
