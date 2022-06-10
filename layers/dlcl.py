@@ -1,5 +1,7 @@
-import flax.linen as nn
+from typing import Tuple
+
 from flax import struct
+import flax.linen as nn
 import jax
 import jax.numpy as jnp
 
@@ -14,8 +16,9 @@ class Variables():
 
 
 class DynamicLinearCombination(nn.Module):
-    weight_dim: int
     num_layers: int
+    input_shape: Tuple[int]
+    weight_dim: int = 1
     weight_normalizing_type: str = 'avg'
     window_size: int = -1
     normalized_before: bool = False
@@ -37,6 +40,8 @@ class DynamicLinearCombination(nn.Module):
         )
         self.weights = self.param('dlcl_weights', self.init_fn, self.shape,
                                   self.window_size, self.weight_dim, self.weight_normalizing_type)
+
+        self._init(jnp.ones(shape=(self.input_shape[-1], )))
 
     def weight_normalizing(self, weights: jnp.ndarray, dim: int, norm_type: str):
         if norm_type == 'avg':
@@ -119,8 +124,6 @@ class DynamicLinearCombination(nn.Module):
             self.add_to_memory(inputs)
         elif operation_type == 'forward':
             return self.forward(deterministic)
-        elif operation_type == 'init':
-            self._init(inputs)
         else:
             raise ValueError(
-                f'Unknown operation type, {operation_type}. Available operations are [forward, add_to_memory, init]')
+                f'Unknown operation type, {operation_type}. Available operations are [forward, add_to_memory]')
