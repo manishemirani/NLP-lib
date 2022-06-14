@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, Callable, Iterable, Sequence
+from typing import Tuple
 from layers.flow_ODE_layers import Flow_ODENet
 
 import flax.linen as nn
@@ -100,57 +100,3 @@ class FlowPosEmbedding(nn.Module):
         bias_vector = self.flow_odenet(self.flow_weights)
 
         return bias_vector
-#
-#
-# config = ml_collections.ConfigDict()
-#
-# config.share_embeddings = None
-# config.embedding_initializer = nn.initializers.normal(stddev=1.0)
-# config.max_len = None
-# config.posemb_initializer = None
-# config.embedding_dim = 512
-# config.vocab_size = 10
-# config.output_vocab_size = 10
-# config.dropout_rate = 0.1
-# config.deterministic = False
-# config.dtype = jnp.float32
-# config.start_point = 0.
-# config.end_point = 8.
-# config.epsilon = 1e-4
-# config.kernel_init = nn.initializers.lecun_normal()
-# config.bias_init = nn.initializers.zeros
-# config.label_smoothing = 0.01
-# config.metric_mode = 'weighted'
-# config.lr_config = ml_collections.ConfigDict()
-# config.lr_config.lr_schedule = 'rsqrt'
-# config.res_operation = 'add'
-# config.num_heads = 8
-# config.qkv_features = 512
-# config.out_features = None
-# config.use_same_qk_weights = False
-# # config.attention_fn = dot_product_attention
-# config.broadcast_dropout = False
-# config.mha_dropout_rate = 0.1
-# config.deterministic = False
-# config.mha_kernel_init = nn.initializers.lecun_normal()
-# config.mha_bias_init = nn.initializers.zeros
-# config.use_bias_mha = False
-# config.mlp_dim = 1024
-# config.mlp_out_dim = None
-# config.mlp_use_bias = True
-# config.mlp_kernel_init = nn.initializers.lecun_normal()
-# config.mlp_bias_init = nn.initializers.zeros
-# config.mlp_activation_fn = nn.relu
-# config.mlp_deterministic = False
-# config.decode = False
-# config.use_attend = False
-# config.num_flow_layers = 1
-# config.flow_layers = 10
-# config.flow_model = 'linear'
-# config.flow_activation_fn = nn.relu
-#
-#
-# x = random.normal(random.PRNGKey(1), shape=(10, 10, 512))
-#
-# model = FlowPosEmbedding(config)
-# params = model.init(random.PRNGKey(0), x)
