@@ -131,7 +131,7 @@ class ODEDecoder(BaseDecoder):
             x = self._shift_right(x)
 
         x = self.embedding(x)
-        x = SinusoidalPosEmbedding(config=self.config, name='posemb_target')(x, positions=targets_positions)
+        x = self.pos_encoding(x, positions=targets_positions)
         x = nn.Dropout(rate=self.config.dropout_rate)(
             x, deterministic=self.config.deterministic)
 
