@@ -10,23 +10,22 @@ class ActNorm(nn.Module):
     dtype: jnp.dtype = jnp.float32
 
     def setup(self):
-        scale_fn = lambda rng, dim: self.scale_init_fn(dim, rng)
-        bias_fn = lambda rng, scale, dim: self.bias_init_fn(scale, dim, rng)
-        self.scale = self.param('scale_weights', scale_fn, self.input_shape)
-        self.bias = self.param('bias_weights', bias_fn,
-                               self.scale, self.input_shape)
+        scale_fn = lambda rng: self._scale_init_fn(rng)
+        bias_fn = lambda rng, scale: self._bias_init_fn(scale, rng)
+        self.scale = self.param('scale_weights', scale_fn)
+        self.bias = self.param('bias_weights', bias_fn, self.scale)
 
-    def scale_init_fn(self, shape, rng):
-        init_input = random.normal(rng, shape=shape)
-        if len(shape) > 1:
+    def _scale_init_fn(self, rng):
+        init_input = random.normal(rng, shape=self.input_shape)
+        if init_input.ndim > 1:
             init_input = self._transpose(init_input)
         scale = 1. / jnp.std(init_input.reshape((-1, init_input.shape[-1])), axis=0,
                              dtype=self.dtype)
         return scale
 
-    def bias_init_fn(self, scale, shape, rng):
-        init_input = random.normal(rng, shape=shape)
-        if len(shape) > 1:
+    def _bias_init_fn(self, scale, rng):
+        init_input = random.normal(rng, shape=self.input_shape)
+        if init_input.ndim > 1:
             init_input = self._transpose(init_input)
         bias = jnp.multiply(-scale, jnp.mean(init_input.reshape(-1, init_input.shape[-1]), axis=0))
         return bias
