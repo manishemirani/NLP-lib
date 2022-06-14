@@ -32,7 +32,7 @@ class EncoderLayer(nn.Module):
             deterministic=self.config.deterministic,
             kernel_init=self.config.mha_kernel_init,
             bias_init=self.config.mha_bias_init,
-            use_bias=self.config.use_bias_mha,
+            use_bias=self.config.mha_use_bias,
             dtype=self.config.dtype
         )(x, x, time, encoder_mask)
 
@@ -85,7 +85,7 @@ class DecoderLayer(nn.Module):
             deterministic=self.config.deterministic,
             kernel_init=self.config.mha_kernel_init,
             bias_init=self.config.mha_bias_init,
-            use_bias=self.config.use_bias_mha,
+            use_bias=self.config.mha_use_bias,
             dtype=self.config.dtype
         )(x, x, time, decoder_mask)
 
@@ -108,7 +108,7 @@ class DecoderLayer(nn.Module):
             deterministic=self.config.deterministic,
             kernel_init=self.config.mha_kernel_init,
             bias_init=self.config.mha_bias_init,
-            use_bias=self.config.use_bias_mha,
+            use_bias=self.config.mha_use_bias,
             dtype=self.config.dtype
         )(x, encoded_tokens, time, encoder_decoder_mask)
 
