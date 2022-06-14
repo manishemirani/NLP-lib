@@ -19,7 +19,7 @@ class ActNorm(nn.Module):
     def scale_init_fn(self, shape, rng):
         init_input = random.normal(rng, shape=shape)
         if len(shape) > 1:
-            init_input = self._transpose(init_input, len(shape))
+            init_input = self._transpose(init_input)
         scale = 1. / jnp.std(init_input.reshape((-1, init_input.shape[-1])), axis=0,
                              dtype=self.dtype)
         return scale
@@ -27,12 +27,12 @@ class ActNorm(nn.Module):
     def bias_init_fn(self, scale, shape, rng):
         init_input = random.normal(rng, shape=shape)
         if len(shape) > 1:
-            init_input = self._transpose(init_input, len(shape))
+            init_input = self._transpose(init_input)
         bias = jnp.multiply(-scale, jnp.mean(init_input.reshape(-1, init_input.shape[-1]), axis=0))
         return bias
 
-    def _transpose(self, inputs, dim):
-        permutations = [i for i in range(dim)]
+    def _transpose(self, inputs):
+        permutations = [i for i in range(inputs.ndim)]
         a, b = permutations[1], permutations[-1]
         permutations[1], permutations[-1] = b, a
         return jnp.transpose(inputs, permutations)
@@ -41,17 +41,17 @@ class ActNorm(nn.Module):
 
         if operation == 'forward':
             if x.ndim > 1:
-                x = self._transpose(x, x.ndim)
+                x = self._transpose(x)
             x = jnp.multiply(self.scale, x) + self.bias
             if x.ndim > 1:
-                x = self._transpose(x, x.ndim)
+                x = self._transpose(x)
             return x
         if operation == 'inverse':
             if x.ndim > 1:
-                x = self._transpose(x, x.ndim)
+                x = self._transpose(x)
             x = jnp.multiply(x - self.bias, 1. / self.scale)
             if x.ndim > 1:
-                x = self._transpose(x, x.ndim)
+                x = self._transpose(x)
             return x
         else:
             raise ValueError(f'Unknown operation type {operation}. Available operations are [forward, inverse]')
