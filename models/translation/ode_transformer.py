@@ -1,4 +1,3 @@
-from typing import Tuple
 from functools import partial
 
 from layers.attention_layers import dot_product_attention
@@ -6,7 +5,6 @@ from layers.base_layers import EncoderLayer, DecoderLayer
 from models.model_utils.metrics import get_metrics
 from models.model_utils.lr_schedules import get_lr_schedule
 from models.base_models import *
-from utils.dataset import get_wmt_dataset
 import flax.linen as nn
 import jax.numpy as jnp
 from jax.experimental.ode import odeint
@@ -98,7 +96,7 @@ class ODEEncoder(BaseEncoder):
 
         x = source_tokens.astype('int32')
         x = self.embedding(x)
-        x = self.pos_encoding(x, input_position=source_positions)
+        x = self.pos_encoding(x, positions=source_positions)
         x = nn.Dropout(rate=self.config.dropout_rate)(
             x, deterministic=self.config.deterministic)
         x = x.astype(self.config.dtype)
@@ -133,7 +131,7 @@ class ODEDecoder(BaseDecoder):
             x = self._shift_right(x)
 
         x = self.embedding(x)
-        x = SinusoidalPosEmbedding(config=self.config, name='posemb_target')(x, input_position=targets_positions)
+        x = SinusoidalPosEmbedding(config=self.config, name='posemb_target')(x, positions=targets_positions)
         x = nn.Dropout(rate=self.config.dropout_rate)(
             x, deterministic=self.config.deterministic)
 
@@ -194,7 +192,7 @@ class ODETranslation(BaseModel):
         self.config = config
 
     def build_model(self):
-        return Translation(ODEEncoder, ODEDecoder, self.config)
+        return ODETransformer(ODEEncoder, ODEDecoder, self.config)
 
     def loss_fn(self, logits: jnp.ndarray, targets: jnp.ndarray, weight: Optional[jnp.ndarray] = None,
                 label_weights: Optional[jnp.ndarray] = None):
@@ -249,47 +247,3 @@ class ODETranslation(BaseModel):
         config.use_attend = False
 
         return config
-
-
-config = ml_collections.ConfigDict
-config.ds_keys = ['inputs', 'targets']
-config.eval_dataset = None
-config.max_target_length = 250
-config.max_eval_length = 250
-config.max_predict_length = 250
-config.eval_split = 'test'
-config.download_dir = '/home/mani/tensorflow_datasets'
-config.input_lang_vocab = './input_vocab.txt'
-config.target_lang_vocab = './target_vocab.txt'
-config.vocab_size = 8000
-config.reversed_tokens = ["[PAD]", "[UNK]", "[START]", "[END]"]
-config.bert_tokenizer_params = dict(lower_case=True)
-config.learn_params = {}
-config.lower_case = True
-config.dataset_name = 'ted_hrlr_translate/pt_to_en'
-config.batch_size = 32
-config.num_epochs = 10
-config.train_split = 'train'
-config.shuffle = False
-config.shuffle_buffer_size = 10_000
-config.drop_remainder = False
-config.reverse_translation = False
-config.pack_examples = True
-config.ds_keys = ['inputs', 'targets']
-
-# x, _, _, _, _ = get_wmt_dataset(config)
-
-# train_keys = [
-#     "inputs", "targets", "inputs_position", "targets_position",
-#     "inputs_segmentation", "targets_segmentation"]
-#
-# (inputs, targets, inputs_positions, targets_positions, inputs_segmentation,
-#  targets_segmentation) = [next(iter(x)).get(k, None) for k in train_keys]
-#
-x = random.normal(random.PRNGKey(3), shape=(10, 10))
-y = random.normal(random.PRNGKey(4), shape=(10, 10))
-
-model = ODETranslation()
-test_model = model.build_model()
-rngs = {'params': random.PRNGKey(0), 'dropout': random.PRNGKey(1)}
-variables = test_model.init(rngs, x, y)
