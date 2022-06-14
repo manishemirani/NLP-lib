@@ -41,7 +41,7 @@ class DynamicLinearCombination(nn.Module):
         self.weights = self.param('dlcl_weights', self.init_fn, self.shape,
                                   self.window_size, self.weight_dim, self.weight_normalizing_type)
 
-        self._init(jnp.ones(shape=(self.input_shape[-1], )))
+        self._init(jnp.ones(shape=self.input_shape))
 
     def weight_normalizing(self, weights: jnp.ndarray, dim: int, norm_type: str):
         if norm_type == 'avg':
@@ -91,6 +91,10 @@ class DynamicLinearCombination(nn.Module):
             layer = self.layer_norms[Variables.counter - 1](layer)
 
         Variables.layers.append(layer)
+
+    def clean(self):
+        Variables.layers = []
+        Variables.counter = 0
 
     def select_weights(self):
         weights = Variables.normalized_weights if Variables.normalized_weights is not None else self.weights
