@@ -36,7 +36,7 @@ class SinusoidalPosEmbedding(nn.Module):
     config: ml_collections.ConfigDict
 
     @nn.compact
-    def __call__(self, inputs: jnp.ndarray, input_position=None):
+    def __call__(self, inputs: jnp.ndarray, positions=None):
         assert inputs.ndim == 3, (f'Number of dimension should be 3, but got {inputs.ndim}')
 
         seq_length = inputs.shape[1]
@@ -55,10 +55,10 @@ class SinusoidalPosEmbedding(nn.Module):
 
         pe = pos_embedding[:, :seq_length, :]
 
-        if input_position is None:
+        if positions is None:
             return inputs + pe
         else:
-            return inputs + jnp.take(pe[0], input_position, axis=0)
+            return inputs + jnp.take(pe[0], positions, axis=0)
 
 
 class FlowPosEmbedding(nn.Module):
